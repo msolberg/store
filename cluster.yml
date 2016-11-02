@@ -1,0 +1,5 @@
+- name: Cluster Tasks
+  hosts: all
+  tasks:
+    - name: Cluster Status
+      shell: pcs status
