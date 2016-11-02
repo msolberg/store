@@ -3,3 +3,7 @@
   tasks:
     - name: Cluster Status
       shell: pcs status
+      register: out
+    
+    - debug var=out.stdout_lines
+
