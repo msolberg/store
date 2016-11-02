@@ -5,5 +5,5 @@
       shell: pcs status
       register: out
     
-    - debug var=out.stdout_lines
+    - debug: var=out.stdout_lines
 
