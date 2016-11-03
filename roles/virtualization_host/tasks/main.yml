@@ -1,0 +1,22 @@
+---
+# This role installs and configures virtualization software
+
+# Make sure that the firewall allows ssh for live migration
+- name: Start firewall
+  service: name=firewalld state=started enabled=yes
+
+- name: Firewall rule for pcsd
+  firewalld: service=ssh permanent=true state=enabled immediate=yes
+
+- name: Install virtualization software
+  yum: name={{ item }} state=present
+  with_items:
+  - libvirt
+  - virt-install
+  - qemu-kvm
+
+- name: Start the libvirtd service
+  service: name=libvirtd state=started enabled=yes
+
+
+

@@ -1,0 +1,7 @@
+---
+# Cluster_wide variables
+
+nfs_volume: storage2.phx.salab.redhat.com:/exports/cluster-export
+satellite_url: satellite.phx.salab.redhat.com
+satellite_org: Default_Organization
+satellite_key: rhel7

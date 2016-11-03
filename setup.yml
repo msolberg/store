@@ -1,0 +1,39 @@
+---
+# Sets up the cluster
+
+- name: Set up cluster
+  hosts: cluster_nodes
+  pre_tasks:
+  # Register to Satellite
+  - name: Download Satellite 6 config RPM
+    yum: name=http://{{ satellite_url }}/pub/katello-ca-consumer-latest.noarch.rpm state=present
+  
+  - name: Register to Satellite
+    redhat_subscription:
+      state: present
+      activationkey: "{{ satellite_key }}"
+      org_id: "{{ satellite_org }}"
+
+  # Install some packages
+  - name: Install pre-requisites
+    yum: name={{ item }} state=present
+    with_items:
+    - libsemanage-python
+    - nfs-utils
+  
+  # Add the NFS mount point for our guests
+  - name: Add NFS mount point
+    mount:
+      name: /mnt
+      src: "{{ nfs_volume }}"
+      fstype: nfs
+      opts: defaults
+      state: mounted
+  
+  # Set the SELinux boolean we need for accessing NFS storage
+  - name: Set virt_use_nfs boolean
+    seboolean: name=virt_use_nfs persistent=yes state=yes
+  
+  roles:
+  - cluster_node
+  - virtualization_host

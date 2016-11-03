@@ -1,0 +1,3 @@
+---
+# This is the password (crypted) to use for the hacluster user
+hacluster_password: '$5$ueoc46tx$7a4fPhUDxj68ryRyz4De3CIBIYKK/e3JMBjyoWgD1v.'

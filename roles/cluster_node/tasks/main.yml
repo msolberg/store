@@ -1,0 +1,22 @@
+---
+# This role contains plays that will configure a cluster node
+
+- name: Start firewall
+  service: name=firewalld state=started enabled=yes
+
+- name: Firewall rule for pcsd
+  firewalld: service=high-availability permanent=true state=enabled immediate=yes
+ 
+- name: Install cluster software
+  yum: name={{ item }} state=present
+  with_items:
+  - pcs
+  - pacemaker
+  - fence-agents-all
+
+- name: Set password for hacluster user
+  user: name=hacluster password={{ hacluster_password }}
+
+- name: Start the Pacemaker service
+  service: name=pcsd state=started enabled=yes
+
