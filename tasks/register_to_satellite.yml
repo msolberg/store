@@ -1,0 +1,10 @@
+---
+# Register to Satellite
+- name: Download Satellite 6 config RPM
+  yum: name=http://{{ satellite_url }}/pub/katello-ca-consumer-latest.noarch.rpm state=present
+
+- name: Register to Satellite
+  redhat_subscription:
+    state: present
+    activationkey: "{{ satellite_key }}"
+    org_id: "{{ satellite_org }}"

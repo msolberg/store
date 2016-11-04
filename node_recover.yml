@@ -1,15 +1,22 @@
 ---
-# Sets up the cluster
+# This playbook should be run against a cluster when a node is rebuilt.
+# It will re-authenticate the node to the cluster and add it back in.
 
-- name: Prerequisites
+- name: Gather Facts
+  hosts: cluster_nodes
+  tasks: []
+
+- name: Distribute SSH Keys
   hosts: cluster_nodes
   tasks:
-  # Distribute SSH Keys
   - include: tasks/distribute_ssh_keys.yml
-  
+
+- hosts: cluster_nodes
+  serial: 1
+  pre_tasks:
   # Register to Satellite
   - include: tasks/register_to_satellite.yml
-  
+
   # Install some packages
   - name: Install pre-requisites
     yum: name={{ item }} state=present
@@ -17,9 +24,6 @@
     - libsemanage-python
     - nfs-utils
   
-- name: Set up cluster
-  hosts: cluster_nodes
-  pre_tasks:
   # Add the NFS mount point for our guests
   - name: Add NFS mount point
     mount:
@@ -39,16 +43,14 @@
   
   post_tasks:
   - name: Authenticate Cluster
-    run_once: true
     command: >
       pcs cluster auth -u hacluster -p {{ cluster_password }}
       {% for host in groups['cluster_nodes'] %}
       {{ hostvars[host]['ansible_hostname'] }}
       {% endfor %}
-      creates=/var/lib/pcsd/tokens
-  
+      creates=/var/lib/pcsd/tokens 
+ 
   - name: Create Cluster
-    run_once: true
     command: >
       pcs cluster setup --name store
       {% for host in groups['cluster_nodes'] %}
@@ -61,7 +63,4 @@
   
   - name: Enable Cluster Services
     command: pcs cluster enable
-  
-  - name: Disable STONITH
-    run_once: true
-    command: pcs property set stonith-enabled=false
+

@@ -1,0 +1,14 @@
+---
+# Setup SSH Keys
+- name: Generate SSH key
+  user: name=root generate_ssh_key=yes
+  register: rootkeys
+  
+# Distribute SSH Keys
+- name: Distribute SSH keys
+  authorized_key:
+    key: "{{ hostvars[item].rootkeys.ssh_public_key }}"
+    state: present
+    user: root
+  with_items:
+    "{{ groups['cluster_nodes'] }}"
