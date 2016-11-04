@@ -5,3 +5,7 @@ nfs_volume: storage2.phx.salab.redhat.com:/exports/cluster-export
 satellite_url: satellite.phx.salab.redhat.com
 satellite_org: Default_Organization
 satellite_key: rhel7
+cluster_name: store
+cluster_password: 'pacemaker'
+# This is the password (crypted) to use for the hacluster user
+hacluster_password: '$5$u./oXW5W$J.61uOASBoYb68nlcQdGusS32xEFGN1XgQochF1t/rA'

@@ -37,3 +37,32 @@
   roles:
   - cluster_node
   - virtualization_host
+  
+  post_tasks:
+  - name: Authenticate Cluster
+    run_once: true
+    command: >
+      pcs cluster auth -u hacluster -p {{ cluster_password }}
+      {% for host in groups['cluster_nodes'] %}
+      {{ hostvars[host]['ansible_hostname'] }}
+      {% endfor %}
+      creates=/var/lib/pcsd/tokens
+  
+  - name: Create Cluster
+    run_once: true
+    command: >
+      pcs cluster setup --name store
+      {% for host in groups['cluster_nodes'] %}
+      {{ hostvars[host]['ansible_hostname'] }}
+      {% endfor %}
+      creates=/etc/corosync/corosync.conf
+  
+  - name: Disable STONITH
+    run_once: true
+    command: pcs property set stonith-enabled=false
+
+  - name: Start Cluster Services
+    command: pcs cluster start
+  
+  - name: Enable Cluster Services
+    command: pcs cluster enable
