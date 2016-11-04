@@ -1,0 +1,28 @@
+---
+# Deploys virtual machines onto the cluster
+# TODO: We're making some assumptions here about the type of storage.
+
+- name: Deploy VM
+  hosts: cluster_nodes
+  run_once: true
+  tasks:
+  - name: Copy backing store from rhel image
+    command: cp /mnt/guests/{{ vm_image }} /mnt/guests/{{ vm_name }}.qcow2 creates=/mnt/guests/{{ vm_name }}.qcow2
+  
+  - name: Create VM XML definition
+    template: src=templates/vm.xml.j2 dest=/mnt/guests/{{ vm_name }}.xml
+  
+  - name: See if the pacemaker resource is already defined
+    command: pcs resource show {{ vm_name }}
+    register: resource_show
+    ignore_errors: True
+  
+  - name: Create the resource
+    command: pcs resource create {{ vm_name }} VirtualDomain config=/mnt/guests/{{ vm_name }}.xml migration_transport="ssh"
+    when: resource_show.rc == 1
+  
+  - name: Set resource metadata
+    command: pcs resource meta {{ vm_name }} allow-migrate="true"
+    when: resource_show.rc == 1
+  vars:
+    vm_name: test
