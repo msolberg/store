@@ -1,0 +1,21 @@
+---
+# Deletes virtual machines from the cluster
+# TODO: We're making some assumptions here about the type of storage.
+
+- name: Delete VM
+  hosts: cluster_nodes
+  run_once: true
+  tasks:
+  - name: Test if the pacemaker resource is defined
+    command: pcs resource show {{ vm_name }}
+  
+  - name: Delete the resource
+    command: pcs resource delete {{ vm_name }}
+  
+  - name: Delete VM XML definition
+    file: path=/mnt/guests/{{ vm_name }}.xml state=absent
+  
+  - name: Delete backing store
+    file: path=/mnt/guests/{{ vm_name }}.qcow2 state=absent
+  vars:
+    vm_name: test
