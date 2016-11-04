@@ -1,0 +1,31 @@
+---
+# Loops through the cluster nodes, puts them in standby, updates them and reboots them.
+# TODO: I'm not rebooting here
+# TODO: Only waits a minute for the node to go into standby. Should probably be configurable
+
+- hosts: cluster_nodes
+  serial: 1
+  
+  tasks:
+  - name: Put the cluster node in standby
+    command: pcs cluster standby {{ inventory_hostname }}
+  
+  - name: Wait for node to go into standby
+    command: pcs cluster status
+    register: cluster_status
+    until: "cluster_status.stdout.find('{{ inventory_hostname }}: standby') != -1"
+    retries: 6
+    delay: 10
+
+  - name: Update packages
+    yum: name="*" state=latest
+  
+  - name: Bring node back into service
+    command: pcs cluster unstandby {{ inventory_hostname }}
+  
+  - name: Wait for node to come back into service
+    command: pcs cluster status
+    register: cluster_status
+    until: "cluster_status.stdout.find('{{ inventory_hostname }}: Online') != -1"
+    retries: 6
+    delay: 10
