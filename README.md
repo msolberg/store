@@ -6,8 +6,10 @@ The following playbooks are implemented:
 
 * `status.yml` : Displays the current cluster status from `pcs status`
 * `setup.yml` : Deploys and configures pacemaker and libvirt on the hosts in the "cluster_nodes" group
+* `cluster_update.yml`: Updates the cluster nodes to the latest software packages available
 * `vm_deploy.yml` : Deploys a virtual machine onto the cluster
 * `vm_delete.yml` : Deletes a virtual machine from the cluster
+
 
 Examples:
 
@@ -20,6 +22,10 @@ Installs and configures the cluster.
 Show the current cluster status.
 
 `ansible-playbook -e 'vm_name=db' -i hosts vm_deploy.yml`
+
+Update the cluster.
+
+`ansible-playbook -i hosts cluster_update.yml`
 
 Deploys a virtual machine named "db" onto the cluster.
 
