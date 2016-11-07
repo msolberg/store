@@ -14,3 +14,6 @@ vm_image: rhel-guest-image-7.2-20160302.0.x86_64.qcow2
 vm_memory: 1024
 vm_cores: 1
 vm_bridge: br0
+
+# Network interface to use for the virtualization bridge
+if_name: enp2s0f0
