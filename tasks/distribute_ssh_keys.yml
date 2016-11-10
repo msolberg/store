@@ -12,3 +12,14 @@
     user: root
   with_items:
     "{{ groups['cluster_nodes'] }}"
+
+# Remove known_hosts file
+# TODO: This shouldn't have to happen on every run.
+- name: Clear out old SSH host keys
+  file: path=/etc/ssh/ssh_known_hosts state=absent
+
+# Add hosts to known_hosts
+- name: Add host keys to known hosts
+  shell: ssh-keyscan {{ item }} >> /etc/ssh/ssh_known_hosts
+  with_items:
+    "{{ groups['cluster_nodes'] }}"

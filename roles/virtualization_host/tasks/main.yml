@@ -5,9 +5,12 @@
 - name: Start firewall
   service: name=firewalld state=started enabled=yes
 
-- name: Firewall rule for pcsd
+- name: Firewall rule for SSH connectivity
   firewalld: service=ssh permanent=true state=enabled immediate=yes
-
+  
+- name: Firewall rule for live migration
+  firewalld: port=49152-49216/tcp permanent=true state=enabled immediate=yes
+  
 - name: Setup virtualization bridge
   template: src=roles/virtualization_host/templates/ifcfg-br0.j2 dest=/etc/sysconfig/network-scripts/ifcfg-br0
   
