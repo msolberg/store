@@ -8,3 +8,10 @@
     state: present
     activationkey: "{{ satellite_key }}"
     org_id: "{{ satellite_org }}"
+
+- name: Install Satellite 6 Agent
+  yum: name=katello-agent state=latest
+
+- name: Start Satellite 6 Agent
+  service: name=goferd state=started enabled=yes
+  
