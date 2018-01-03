@@ -1,0 +1,19 @@
+---
+# Deletes a register from the store server
+
+- name: Delete Register
+  hosts: store_server
+  run_once: true
+  tasks:
+  - name: Check if system is already defined
+    command: cobbler system find --name="{{ register_name }}"
+    register: system_find
+    ignore_errors: True
+  
+  - name: Delete the system
+    command: cobbler system remove --name="{{ register_name }}"
+    when: system_find.stdout == register_name
+  
+  vars:
+    register_name: register1
+    register_profile: RHEL-7.4-x86_64

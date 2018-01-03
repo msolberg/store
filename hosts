@@ -1,3 +1,6 @@
 [cluster_nodes]
 rhnode1
 rhnode2
+
+[store_server]
+server1

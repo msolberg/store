@@ -1,0 +1,20 @@
+---
+# Deploys a register from the store server
+
+- name: Deploy Register
+  hosts: store_server
+  run_once: true
+  tasks:
+  - name: Check if system is already defined
+    command: cobbler system find --name="{{ register_name }}"
+    register: system_find
+    ignore_errors: True
+  
+  - name: Create the system
+    command: cobbler system add --name="{{ register_name }}" --profile="{{ register_profile }}" --mac="{{ register_mac }}" --interface=eth0
+    when: system_find.stdout == ""
+  
+  vars:
+    register_name: register1
+    register_mac: 00:1a:4a:58:ec:93
+    register_profile: RHEL-7.4-x86_64
