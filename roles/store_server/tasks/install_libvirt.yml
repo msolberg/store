@@ -1,0 +1,18 @@
+---
+# This set of tasks installs and configures libvirt
+
+- name: Install libvirt service
+  package:
+    name: libvirt
+    state: latest
+
+- name: Install virt-install package
+  package:
+    name: virt-install
+    state: latest
+
+- name: Enable libvirtd service
+  service:
+    name: libvirtd
+    state: started
+
