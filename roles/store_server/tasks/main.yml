@@ -1,0 +1,89 @@
+---
+# This role contains the plays that will configure a store server
+
+- name: Install TFTP service
+  package:
+    name: tftp-server
+    state: latest
+
+- name: Enable TFTP service
+  service:
+    name: tftp.socket
+    state: started
+
+- name: Allow TFTP in the Firewall (TCP)
+  firewalld:
+    port: 69/tcp
+    permanent: true
+    state: enabled
+
+- name: Allow TFTP in the Firewall (UDP)
+  firewalld:
+    port: 69/udp
+    permanent: true
+    state: enabled
+
+- name: Check for EPEL
+  command: rpm -q epel-release
+  register: epelcheck
+  ignore_errors: yes
+
+- name: Install EPEL (Needed for Cobbler)
+  command: rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  when: "epelcheck.rc != 0"
+
+- name: Install Cobbler
+  package: 
+    name: cobbler
+    state: latest
+
+- name: Enable Cobbler Service
+  service: 
+    name: cobblerd
+    state: started
+
+- name: Allow Cobblerd in the Firewall (25150)
+  firewalld:
+    port: 25150/tcp
+    permanent: true
+    state: enabled
+
+- name: Allow Cobblerd in the Firewall (25151)
+  firewalld:
+    port: 25151/tcp
+    permanent: true
+    state: enabled
+
+- name: Enable HTTPD Service
+  service:
+    name: httpd
+    state: started
+
+- name: Allow HTTP in the Firewall (80)
+  firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+
+- name: Allow HTTP in the Firewall (443)
+  firewalld:
+    port: 443/tcp
+    permanent: true
+    state: enabled
+
+- name: Install libsemanage-python
+  package:
+    name: libsemanage-python
+    state: latest
+
+- name: Allow HTTPD to Connect to the Network
+  seboolean:
+    name: httpd_can_network_connect
+    state: true
+
+- name: Configure Cobbler
+  template:
+    dest: /etc/cobbler/settings
+    src: ../templates/settings.j2
+  notify: restart cobblerd
+

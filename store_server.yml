@@ -1,0 +1,4 @@
+---
+- hosts: store_server
+  roles:
+    - store_server
