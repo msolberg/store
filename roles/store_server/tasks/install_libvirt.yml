@@ -1,6 +1,11 @@
 ---
 # This set of tasks installs and configures libvirt
 
+- name: Install KVM
+  package:
+    name: qemu-kvm
+    state: latest
+
 - name: Install libvirt service
   package:
     name: libvirt
