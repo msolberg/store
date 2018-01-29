@@ -13,9 +13,14 @@
   - name: Set the system to re-deploy
     command: cobbler system edit --name="{{ register_name }}" --netboot-enabled=1
     when: system_find.stdout == "{{ register_name }}"
-
+  
+  - name: Optionally change the profile
+    command: cobbler system edit --name="{{ register_name }}" --profile="{{ profile_name }}"
+    when: profile_name != "unchanged"
+  
   vars:
     register_name: register1
+    profile_name: unchanged
 
 # TODO: We're rebooting regardless of whether or not we set the system to redeploy
 - name: Reboot Register  
