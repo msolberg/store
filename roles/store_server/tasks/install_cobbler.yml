@@ -9,7 +9,7 @@
 - name: Enable TFTP service
   service:
     name: tftp
-    state: enabled
+    state: started
 
 - name: Allow TFTP in the Firewall (TCP)
   firewalld:
