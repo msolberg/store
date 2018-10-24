@@ -4,6 +4,9 @@
 - name: Install and Configure Cobbler
   include_tasks: install_cobbler.yml
 
+- name: Install and Configure Cobbler Web
+  include_tasks: install_cobbler_web.yml
+
 - name: Install and Configure Libvirt
   include_tasks: install_libvirt.yml
 
