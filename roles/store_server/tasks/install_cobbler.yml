@@ -8,8 +8,8 @@
 
 - name: Enable TFTP service
   service:
-    name: tftp.socket
-    state: started
+    name: tftp
+    state: enabled
 
 - name: Allow TFTP in the Firewall (TCP)
   firewalld:
