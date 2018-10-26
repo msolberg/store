@@ -22,16 +22,16 @@
 
 - name: Allow TFTP in the Firewall (TCP)
   firewalld:
-    service: tftp
-    # port: 69/tcp
+    # service: tftp
+    port: 69/tcp
     permanent: true
     state: enabled
 
-# - name: Allow TFTP in the Firewall (UDP)
-  # firewalld:
-    # port: 69/udp
-    # permanent: true
-    # state: enabled
+- name: Allow TFTP in the Firewall (UDP)
+  firewalld:
+    port: 69/udp
+    permanent: true
+    state: enabled
 
 - name: Install DHCP service
   package:
@@ -87,15 +87,15 @@
 
 - name: Allow HTTP in the Firewall (80)
   firewalld:
-    service: http
-    # port: 80/tcp
+    # service: http
+    port: 80/tcp
     permanent: true
     state: enabled
 
 - name: Allow HTTP in the Firewall (443)
   firewalld:
-    service: https
-    # port: 443/tcp
+    # service: https
+    port: 443/tcp
     permanent: true
     state: enabled
 
@@ -113,12 +113,12 @@
 # FIXME
 # I assume there is a better way than this.
 # need to run selinux rules
-# setsebool -P httpd_can_network_connect true
+# setsebool -P httpd_can_network_connect 1
 # setsebool -P cobbler_can_network_connect 1
 # setsebool -P httpd_serve_cobbler_files 1
 
 - name: configure selinux 1
-  command: setsebool -P httpd_can_network_connect true
+  command: setsebool -P httpd_can_network_connect_cobbler 1
 
 - name: configure selinux 2
   command: setsebool -P cobbler_can_network_connect 1
