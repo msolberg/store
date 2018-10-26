@@ -1,6 +1,5 @@
 ---
 # This set of tasks installs and configures Cobbler
-
 - name: Install TFTP service
   package:
     name: tftp-server
@@ -11,17 +10,44 @@
     name: tftp
     state: started
 
+- name: install pykickstart
+  package:
+    name: pykickstart
+    state: latest
+
+- name: install selinux utils
+  package:
+    name: policycoreutils-python
+    state: latest
+
 - name: Allow TFTP in the Firewall (TCP)
   firewalld:
-    port: 69/tcp
+    service: tftp
+    # port: 69/tcp
     permanent: true
     state: enabled
 
-- name: Allow TFTP in the Firewall (UDP)
+# - name: Allow TFTP in the Firewall (UDP)
+  # firewalld:
+    # port: 69/udp
+    # permanent: true
+    # state: enabled
+
+- name: Install DHCP service
+  package:
+    name: dhcp
+    state: latest
+
+- name: Allow DHCP in the firewall
   firewalld:
-    port: 69/udp
+    service: dhcp
     permanent: true
     state: enabled
+
+- name: Enable DHCPD Service
+  service:
+    name: dhcpd
+    state: started
 
 - name: Check for EPEL
   command: rpm -q epel-release
@@ -61,13 +87,15 @@
 
 - name: Allow HTTP in the Firewall (80)
   firewalld:
-    port: 80/tcp
+    service: http
+    # port: 80/tcp
     permanent: true
     state: enabled
 
 - name: Allow HTTP in the Firewall (443)
   firewalld:
-    port: 443/tcp
+    service: https
+    # port: 443/tcp
     permanent: true
     state: enabled
 
@@ -81,9 +109,54 @@
     name: httpd_can_network_connect
     state: true
 
+
+# FIXME
+# I assume there is a better way than this.
+# need to run selinux rules
+# setsebool -P httpd_can_network_connect true
+# setsebool -P cobbler_can_network_connect 1
+# setsebool -P httpd_serve_cobbler_files 1
+
+- name: configure selinux 1
+  command: setsebool -P httpd_can_network_connect true
+
+- name: configure selinux 2
+  command: setsebool -P cobbler_can_network_connect 1
+
+- name: configure selinux 3
+  command: setsebool -P httpd_serve_cobbler_files 1
+
+- name: Configure DHCP
+  template:
+    dest: /etc/dhcp/dhcpd.conf
+    src: ../templates/dhcpd.conf.j2
+  notify: restart dhcpd
+
+- name: Configure tftpd
+  template:
+    dest: /etc/xinetd.d/tftp
+    src: ../templates/tftp.j2
+  notify: restart xinetd
+
 - name: Configure Cobbler
   template:
     dest: /etc/cobbler/settings
     src: ../templates/settings.j2
   notify: restart cobblerd
 
+- name: Configure Cobbler authentication
+  template:
+    dest: /etc/cobbler/user.digest
+    src: ../templates/cobbler.users.digest.j2
+  notify: restart cobblerd
+
+# handlers for the notify
+- name: restart cobblerd
+  service:
+    name: cobblerd
+    state: restarted
+
+- name: restart dhcpd
+  service:
+    name: dhcpd
+    state: restarted
