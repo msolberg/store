@@ -126,12 +126,6 @@
 - name: configure selinux 3
   command: setsebool -P httpd_serve_cobbler_files 1
 
-- name: Configure DHCP
-  template:
-    dest: /etc/dhcp/dhcpd.conf
-    src: ../templates/dhcpd.conf.j2
-  notify: restart dhcpd
-
 - name: Configure tftpd
   template:
     dest: /etc/xinetd.d/tftp
