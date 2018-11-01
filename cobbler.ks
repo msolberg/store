@@ -3,8 +3,8 @@
 auth --enableshadow --passalgo=sha512
 repo --name="Server-HighAvailability" --baseurl=file:///run/install/repo/addons/HighAvailability
 repo --name="Server-ResilientStorage" --baseurl=file:///run/install/repo/addons/ResilientStorage
-# Use CDROM installation media
-cdrom
+# Use http on localhost
+install url=http://localhost/rhel-7.6
 # Use graphical install
 text
 # Run the Setup Agent on first boot
