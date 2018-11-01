@@ -1,0 +1,11 @@
+---
+# This role contains the plays that will configure a cobbler server
+
+- name: Install and Configure Cobbler
+  include_tasks: install_cobbler.yml
+
+- name: Install and Configure Cobbler Web
+  include_tasks: install_cobbler_web.yml
+
+
+

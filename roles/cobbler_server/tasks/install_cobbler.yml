@@ -1,0 +1,156 @@
+---
+# This set of tasks installs and configures Cobbler
+- name: Install TFTP service
+  package:
+    name: tftp-server
+    state: latest
+
+- name: Enable TFTP service
+  service:
+    name: tftp
+    state: started
+
+- name: install pykickstart
+  package:
+    name: pykickstart
+    state: latest
+
+- name: install selinux utils
+  package:
+    name: policycoreutils-python
+    state: latest
+
+- name: Allow TFTP in the Firewall (TCP)
+  firewalld:
+    # service: tftp
+    port: 69/tcp
+    permanent: true
+    state: enabled
+
+- name: Allow TFTP in the Firewall (UDP)
+  firewalld:
+    port: 69/udp
+    permanent: true
+    state: enabled
+
+- name: Install DHCP service
+  package:
+    name: dhcp
+    state: latest
+
+- name: Allow DHCP in the firewall
+  firewalld:
+    service: dhcp
+    permanent: true
+    state: enabled
+
+- name: Enable DHCPD Service
+  service:
+    name: dhcpd
+    state: started
+
+- name: Check for EPEL
+  command: rpm -q epel-release
+  register: epelcheck
+  ignore_errors: yes
+
+- name: Install EPEL (Needed for Cobbler)
+  command: rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  when: "epelcheck.rc != 0"
+
+- name: Install Cobbler
+  package: 
+    name: cobbler
+    state: latest
+
+- name: Enable Cobbler Service
+  service: 
+    name: cobblerd
+    state: started
+
+- name: Allow Cobblerd in the Firewall (25150)
+  firewalld:
+    port: 25150/tcp
+    permanent: true
+    state: enabled
+
+- name: Allow Cobblerd in the Firewall (25151)
+  firewalld:
+    port: 25151/tcp
+    permanent: true
+    state: enabled
+
+- name: Enable HTTPD Service
+  service:
+    name: httpd
+    state: started
+
+- name: Allow HTTP in the Firewall (80)
+  firewalld:
+    # service: http
+    port: 80/tcp
+    permanent: true
+    state: enabled
+
+- name: Allow HTTP in the Firewall (443)
+  firewalld:
+    # service: https
+    port: 443/tcp
+    permanent: true
+    state: enabled
+
+- name: Install libsemanage-python
+  package:
+    name: libsemanage-python
+    state: latest
+
+- name: Allow HTTPD to Connect to the Network
+  seboolean:
+    name: httpd_can_network_connect
+    state: true
+
+
+# FIXME
+# I assume there is a better way than this.
+# need to run selinux rules
+# setsebool -P httpd_can_network_connect 1
+# setsebool -P cobbler_can_network_connect 1
+# setsebool -P httpd_serve_cobbler_files 1
+
+- name: configure selinux 1
+  command: setsebool -P httpd_can_network_connect_cobbler 1
+
+- name: configure selinux 2
+  command: setsebool -P cobbler_can_network_connect 1
+
+- name: configure selinux 3
+  command: setsebool -P httpd_serve_cobbler_files 1
+
+- name: Configure tftpd
+  template:
+    dest: /etc/xinetd.d/tftp
+    src: ../templates/tftp.j2
+  notify: restart xinetd
+
+- name: Configure Cobbler
+  template:
+    dest: /etc/cobbler/settings
+    src: ../templates/settings.j2
+  notify: restart cobblerd
+
+- name: Configure Cobbler authentication
+  template:
+    dest: /etc/cobbler/user.digest
+    src: ../templates/cobbler.users.digest.j2
+  notify: restart cobblerd
+
+# handlers for the notify
+- name: restart cobblerd
+  service:
+    name: cobblerd
+    state: restarted
+
+- name: restart dhcpd
+  service:
+    name: dhcpd
+    state: restarted
