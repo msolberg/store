@@ -1,0 +1,15 @@
+DEFAULT menu
+PROMPT 0
+MENU TITLE Store Register
+
+LABEL local
+        MENU LABEL (local)
+        MENU DEFAULT
+        LOCALBOOT -1
+
+LABEL register
+        kernel /images/register/initrd-netboot-suse-SLES12.x86_64-2.1.1.kernel
+        MENU LABEL register
+        append initrd=/images/register/initrd-netboot-suse-SLES12.x86_64-2.1.1.gz ksdevice=bootif lang=  text kssendmac kiwiserver=10.59.119.5
+        ipappend 2
+

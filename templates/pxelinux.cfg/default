@@ -1,0 +1,33 @@
+DEFAULT menu
+PROMPT 0
+MENU TITLE Store
+TIMEOUT 200
+TOTALTIMEOUT 6000
+ONTIMEOUT local
+
+LABEL local
+        MENU LABEL (local)
+        MENU DEFAULT
+        LOCALBOOT -1
+
+LABEL register
+        kernel /images/register/initrd-netboot-suse-SLES12.x86_64-2.1.1.kernel
+        MENU LABEL register
+        append initrd=/images/register/initrd-netboot-suse-SLES12.x86_64-2.1.1.gz ksdevice=bootif lang=  text kssendmac kiwiserver=10.59.119.5
+        ipappend 2
+
+LABEL rhel-server-7.5-x86_64
+        kernel /images/rhel-server-7.5-x86_64/vmlinuz
+        MENU LABEL rhel-server-7.5-x86_64
+        append initrd=/images/rhel-server-7.5-x86_64/initrd.img ksdevice=bootif lang=  kssendmac text  ks=http://10.3.77.177/cblr/svc/op/ks/profile/rhel-server-7.5-x86_64
+        ipappend 2
+
+LABEL rhel-reg
+        kernel /images/rhel-server-7.6-x86_64/vmlinuz
+        append initrd=/images/rhel-server-7.6-x86_64/initrd.img ksdevice=bootif lang=  kssendmac text  ks=http://10.59.119.5/kickstarts/rhel_reg.ks
+        ipappend 2
+
+
+
+
+MENU end
