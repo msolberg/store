@@ -1,31 +1,20 @@
 ---
 # Redeploys a register from the store server
-
-- name: Redeploy Register
-  hosts: store_server
-  run_once: true
-  tasks:
-  - name: Check if system is already defined
-    command: cobbler system find --name="{{ register_name }}"
-    register: system_find
-    ignore_errors: True
-  
-  - name: Set the system to re-deploy
-    command: cobbler system edit --name="{{ register_name }}" --netboot-enabled=1
-    when: system_find.stdout == "{{ register_name }}"
-  
-  - name: Optionally change the profile
-    command: cobbler system edit --name="{{ register_name }}" --profile="{{ profile_name }}"
-    when: profile_name != "unchanged"
-  
-  vars:
-    register_name: register1
-    profile_name: unchanged
-
-# TODO: We're rebooting regardless of whether or not we set the system to redeploy
-- name: Reboot Register  
+- name: Find register MAC
   hosts: "{{ register_name }}"
   tasks:
+  - name: Gather facts for the register
+    setup:
+  
+  - name: Set PXE config for register
+    template:
+      src: templates/pxelinux.cfg/register-{{ register_profile }}
+      # This is the MAC address from the /register/ not from the delegated host.
+      dest: /var/lib/tftpboot/pxelinux.cfg/01-{{ ansible_default_ipv4.macaddress | regex_replace('\:', '-' ) }}
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['store_server'] }}"
+
+# TODO: We're rebooting regardless of whether or not we set the system to redeploy
   - name: restart server
     shell: sleep 2 && shutdown -r now "Redeployment"
     async: 1
@@ -38,3 +27,4 @@
 
   vars:
     register_name: register1
+    register_profile: kiwi
