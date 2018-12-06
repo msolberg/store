@@ -11,8 +11,7 @@
       src: templates/pxelinux.cfg/register-{{ register_profile }}
       # This is the MAC address from the /register/ not from the delegated host.
       dest: /var/lib/tftpboot/pxelinux.cfg/01-{{ ansible_default_ipv4.macaddress | regex_replace('\:', '-' ) }}
-    delegate_to: "{{ item }}"
-    with_items: "{{ groups['store_server'] }}"
+    delegate_to: store_server
 
 # TODO: We're rebooting regardless of whether or not we set the system to redeploy
   - name: restart server
