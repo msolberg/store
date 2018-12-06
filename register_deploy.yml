@@ -7,7 +7,7 @@
   tasks:
   - template:
       src: templates/pxelinux.cfg/register-{{ register_profile }}
-      dest: /var/lib/tftpboot/pxelinux.cfg/{{ register_mac | regex_replace('\:', '-' ) }}
+      dest: /var/lib/tftpboot/pxelinux.cfg/01-{{ register_mac | regex_replace('\:', '-' ) }}
     
   vars:
     register_name: register1
