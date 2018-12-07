@@ -6,7 +6,7 @@
   run_once: true
   tasks:
   - template:
-      src: templates/pxelinux.cfg/register-{{ register_profile }}
+      src: templates/pxelinux.cfg/register-{{ register_profile }}-deploy
       dest: /var/lib/tftpboot/pxelinux.cfg/01-{{ register_mac | regex_replace('\:', '-' ) }}
     
   vars:
