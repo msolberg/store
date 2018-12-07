@@ -1,0 +1,14 @@
+DEFAULT menu
+PROMPT 0
+TIMEOUT 10
+MENU TITLE Store Register
+
+LABEL local
+        MENU LABEL (local)
+        LOCALBOOT -1
+
+LABEL rhelreg
+        MENU DEFAULT
+        kernel /images/rhel-server-7.6-x86_64/vmlinuz
+        append initrd=/images/rhel-server-7.6-x86_64/initrd.img ksdevice=bootif lang=  kssendmac text  ks=http://10.59.119.5/kickstarts/rhel_reg.ks
+        ipappend 2
