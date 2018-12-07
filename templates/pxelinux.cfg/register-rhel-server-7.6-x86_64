@@ -1,5 +1,6 @@
 DEFAULT menu
 PROMPT 0
+TIMEOUT 10
 MENU TITLE Store Register
 
 LABEL local

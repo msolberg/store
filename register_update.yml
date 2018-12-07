@@ -1,0 +1,30 @@
+---
+# Updates a register
+- name: Find register MAC
+  hosts: "{{ register_name }}"
+  tasks:
+  - name: Update all packages on register (RHEL)
+    yum:
+      name: "*"
+      state: latest
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    
+  - name: Update all packages on register (Suse)
+    zypper:
+      name: "*"
+      state: latest
+    when: ansible_os_family == "Suse"
+
+# TODO: We're rebooting regardless of whether or not we set the system to redeploy
+  - name: restart server
+    shell: sleep 2 && shutdown -r now "Redeployment"
+    async: 1
+    poll: 0
+    ignore_errors: true
+  
+  - name: wait for server to come back
+    local_action: wait_for host={{ register_name }} state=started delay=30 timeout=300
+    sudo: false
+
+  vars:
+    register_name: register1
