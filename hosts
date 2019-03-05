@@ -1,6 +1,5 @@
 [cluster_nodes]
-rhnode1
-rhnode2
+rhnode1=192.168.122.12
 
 [store_server]
-server1
+vm2.laptop.rossberry.net

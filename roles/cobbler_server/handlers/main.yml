@@ -1,0 +1,9 @@
+- name: restart cobblerd
+  service:
+    name: cobblerd
+    state: restarted
+
+- name: restart httpd
+  service:
+    name: httpd
+    state: restarted

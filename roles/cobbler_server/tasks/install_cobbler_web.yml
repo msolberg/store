@@ -1,0 +1,12 @@
+---
+# This set of tasks installs and configures Cobbler Web
+
+- name: Install Cobbler Web
+  package:
+    name: cobbler-web
+    state: latest
+
+- name: Restart Apache
+  service:
+    name: httpd
+    state: restarted
